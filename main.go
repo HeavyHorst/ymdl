@@ -81,6 +81,10 @@ func main() {
 	printVersion := flag.Bool("version", false, "print the version and quit")
 	libraryPath := flag.String("lib", defaultLibraryPath, "the path to your music library")
 
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage: %s [options] [album1 album2 ... albumN]\n\nParameters:\n", os.Args[0])
+		flag.PrintDefaults()
+	}
 	flag.Parse()
 
 	if *printVersion {
