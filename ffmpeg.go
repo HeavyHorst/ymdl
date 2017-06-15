@@ -99,7 +99,7 @@ func tagFile(path string, artists []string, title, year, album string, trackNum,
 	}
 	defer tag.Close()
 
-	tag.SetArtist(strings.Join(artists, "/"))
+	tag.SetArtist(strings.Join(artists, "\x00"))
 	tag.SetTitle(title)
 	tag.SetYear(year)
 	tag.SetAlbum(album)
