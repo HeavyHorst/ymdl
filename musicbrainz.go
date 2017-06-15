@@ -20,13 +20,14 @@ import (
 var errNoRelease = errors.New("couldn't find a release")
 
 type musicBrainzRecording struct {
-	year       string
-	albumTitle string
-	cdNum      int64
-	trackNum   int64
-	trackCount int64
-	artist     string
-	trackTitle string
+	year         string
+	albumTitle   string
+	cdNum        int64
+	trackNum     int64
+	trackCount   int64
+	albumArtist  string
+	trackArtists []string
+	trackTitle   string
 }
 
 type musicBrainzRelease struct {
@@ -100,18 +101,27 @@ func getTrackInfo(client *gomusicbrainz.WS2Client, query string) (musicBrainzRec
 
 	proceed := true
 	value := gjson.GetBytes(json, "recordings")
+
 	value.ForEach(func(key, value gjson.Result) bool {
+
+		var artists []string
+		value.Get("artist-credit.#.artist.name").ForEach(func(key, value gjson.Result) bool {
+			artists = append(artists, value.String())
+			return true
+		})
+
 		trackTitle := value.Get("title").String()
 		value.Get("releases").ForEach(func(key, value gjson.Result) bool {
 
 			recording = musicBrainzRecording{
-				artist:     artist,
-				cdNum:      value.Get("media.0.position").Int(),
-				trackCount: value.Get("media.0.track-count").Int(),
-				trackNum:   value.Get("media.0.track-offset").Int() + 1,
-				albumTitle: value.Get("title").String(),
-				year:       value.Get("date").String(),
-				trackTitle: trackTitle,
+				albumArtist:  artist,
+				trackArtists: artists,
+				cdNum:        value.Get("media.0.position").Int(),
+				trackCount:   value.Get("media.0.track-count").Int(),
+				trackNum:     value.Get("media.0.track-offset").Int() + 1,
+				albumTitle:   value.Get("title").String(),
+				year:         value.Get("date").String(),
+				trackTitle:   trackTitle,
 			}
 
 			if len(recording.year) >= 4 {
@@ -119,7 +129,7 @@ func getTrackInfo(client *gomusicbrainz.WS2Client, query string) (musicBrainzRec
 			}
 
 			fmt.Printf("\nRelease: %s (%s)\nCD: %d - %.2d/%.2d\nTrack: %s - %s\n",
-				recording.albumTitle, recording.year, recording.cdNum, recording.trackNum, recording.trackCount, recording.artist, recording.trackTitle)
+				recording.albumTitle, recording.year, recording.cdNum, recording.trackNum, recording.trackCount, strings.Join(artists, ","), recording.trackTitle)
 
 			if askForConfirmation("Choose track?") {
 				proceed = false

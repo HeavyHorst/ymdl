@@ -39,15 +39,15 @@ func convertTrack(inputFile string, mbr musicBrainzRecording, dlFolder string) e
 	if err != nil {
 		return errors.Wrap(err, "getLength failed")
 	}
-
-	trackName := fmt.Sprintf("%.2d %s - %s", mbr.trackNum, mbr.artist, mbr.trackTitle)
+	artists := strings.Join(mbr.trackArtists, ",")
+	trackName := fmt.Sprintf("%.2d %s - %s", mbr.trackNum, artists, mbr.trackTitle)
 	trackFullPath := filepath.Join(dlFolder, trackName) + "." + "mp3"
 
 	if err := transcode(inputFile, trackFullPath, 0.0, float64(l)); err != nil {
 		return errors.Wrap(err, "transcode failed")
 	}
 
-	err = tagFile(trackFullPath, mbr.artist, mbr.trackTitle, mbr.year, mbr.albumTitle, int(mbr.trackNum), int(mbr.trackCount), mbr.cdNum)
+	err = tagFile(trackFullPath, artists, mbr.trackTitle, mbr.year, mbr.albumTitle, int(mbr.trackNum), int(mbr.trackCount), mbr.cdNum)
 	if err != nil {
 		return errors.Wrap(err, "tagFile failed")
 	}

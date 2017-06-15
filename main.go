@@ -51,7 +51,7 @@ func dlRecord(library string, client *gomusicbrainz.WS2Client, vid *ytdl.VideoIn
 	mbr, err := getTrackInfo(client, vid.Title)
 	handleError(err)
 
-	dlFolder := filepath.Join(library, norma.Sanitize(mbr.artist), norma.Sanitize(mbr.albumTitle))
+	dlFolder := filepath.Join(library, norma.Sanitize(mbr.albumArtist), norma.Sanitize(mbr.albumTitle))
 	dlFile := filepath.Join(dlFolder, norma.Sanitize(mbr.trackTitle))
 	defer os.Remove(dlFile)
 
