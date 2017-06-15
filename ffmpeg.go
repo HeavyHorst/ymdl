@@ -9,7 +9,6 @@ import (
 
 	"github.com/bogem/id3v2"
 	"github.com/cheggaaa/pb"
-	"github.com/michiwend/gomusicbrainz"
 	"github.com/pkg/errors"
 )
 
@@ -55,7 +54,7 @@ func convertTrack(inputFile string, mbr musicBrainzRecording, dlFolder string) e
 	return nil
 }
 
-func extractTracks(inputFile, year, album string, tracks []float64, trackInfo []*gomusicbrainz.Track, dlFolder string) error {
+func extractTracks(inputFile string, tracks []float64, mbr musicBrainzRelease, dlFolder string) error {
 	l, err := getLength(inputFile)
 	if err != nil {
 		return errors.Wrap(err, "getLength failed")
@@ -63,14 +62,14 @@ func extractTracks(inputFile, year, album string, tracks []float64, trackInfo []
 
 	tracks = append(tracks, float64(l))
 
-	bar := pb.StartNew(len(trackInfo))
+	bar := pb.StartNew(len(mbr.tracks))
 	defer bar.Finish()
 
 	for i := 0; i < len(tracks)-1; i++ {
-		if len(trackInfo) > i {
+		if len(mbr.tracks) > i {
 
-			artist := trackInfo[i].Recording.ArtistCredit.NameCredits[0].Artist.Name
-			title := trackInfo[i].Recording.Title
+			artist := getArtists(mbr.tracks[i].Recording.ArtistCredit.NameCredits)
+			title := mbr.tracks[i].Recording.Title
 
 			trackName := fmt.Sprintf("%.2d %s - %s", i+1, artist, title)
 			trackFullPath := filepath.Join(dlFolder, trackName) + "." + "mp3"
@@ -82,7 +81,7 @@ func extractTracks(inputFile, year, album string, tracks []float64, trackInfo []
 				return errors.Wrap(err, "transcode failed")
 			}
 
-			err = tagFile(trackFullPath, artist, title, year, album, i+1, len(trackInfo), -1)
+			err = tagFile(trackFullPath, artist, title, mbr.year, mbr.title, i+1, len(mbr.tracks), -1)
 			if err != nil {
 				return errors.Wrap(err, "tagFile failed")
 			}

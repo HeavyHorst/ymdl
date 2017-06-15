@@ -164,7 +164,7 @@ func getAlbumInfo(client *gomusicbrainz.WS2Client, query string) (musicBrainzRel
 		for _, v := range rec.Mediums {
 			fmt.Println("Format: " + v.Format)
 			for _, t := range v.Tracks {
-				fmt.Printf("\t%s: %s - %s\n", t.Number, t.Recording.ArtistCredit.NameCredits[0].Artist.Name, t.Recording.Title)
+				fmt.Printf("\t%s: %s - %s\n", t.Number, getArtists(t.Recording.ArtistCredit.NameCredits), t.Recording.Title)
 			}
 
 			if askForConfirmation("Choose release?") {
@@ -178,4 +178,13 @@ func getAlbumInfo(client *gomusicbrainz.WS2Client, query string) (musicBrainzRel
 		}
 	}
 	return mbr, errNoRelease
+}
+
+func getArtists(nc []gomusicbrainz.NameCredit) string {
+	artists := make([]string, 0, len(nc))
+	for _, v := range nc {
+		artists = append(artists, v.Artist.Name)
+	}
+
+	return strings.Join(artists, ",")
 }

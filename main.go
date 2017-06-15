@@ -44,7 +44,7 @@ func dlRelease(library, url string, client *gomusicbrainz.WS2Client, vid *ytdl.V
 	handleError(err)
 
 	fmt.Println("\nExtracting tracks:")
-	return extractTracks(dlFile, mbr.year, mbr.title, tracks, mbr.tracks, dlFolder)
+	return extractTracks(dlFile, tracks, mbr, dlFolder)
 }
 
 func dlRecord(library string, client *gomusicbrainz.WS2Client, vid *ytdl.VideoInfo) error {
