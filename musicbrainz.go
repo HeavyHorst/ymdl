@@ -190,11 +190,11 @@ func getAlbumInfo(client *gomusicbrainz.WS2Client, query string) (musicBrainzRel
 	return mbr, errNoRelease
 }
 
-func getArtists(nc []gomusicbrainz.NameCredit) string {
+func getArtists(nc []gomusicbrainz.NameCredit) []string {
 	artists := make([]string, 0, len(nc))
 	for _, v := range nc {
 		artists = append(artists, v.Artist.Name)
 	}
 
-	return strings.Join(artists, ",")
+	return artists
 }

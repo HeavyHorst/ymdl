@@ -47,7 +47,7 @@ func convertTrack(inputFile string, mbr musicBrainzRecording, dlFolder string) e
 		return errors.Wrap(err, "transcode failed")
 	}
 
-	err = tagFile(trackFullPath, artists, mbr.trackTitle, mbr.year, mbr.albumTitle, int(mbr.trackNum), int(mbr.trackCount), mbr.cdNum)
+	err = tagFile(trackFullPath, mbr.trackArtists, mbr.trackTitle, mbr.year, mbr.albumTitle, int(mbr.trackNum), int(mbr.trackCount), mbr.cdNum)
 	if err != nil {
 		return errors.Wrap(err, "tagFile failed")
 	}
@@ -71,7 +71,7 @@ func extractTracks(inputFile string, tracks []float64, mbr musicBrainzRelease, d
 			artist := getArtists(mbr.tracks[i].Recording.ArtistCredit.NameCredits)
 			title := mbr.tracks[i].Recording.Title
 
-			trackName := fmt.Sprintf("%.2d %s - %s", i+1, artist, title)
+			trackName := fmt.Sprintf("%.2d %s - %s", i+1, strings.Join(artist, ","), title)
 			trackFullPath := filepath.Join(dlFolder, trackName) + "." + "mp3"
 			start := tracks[i]
 			end := tracks[i+1]
@@ -92,14 +92,14 @@ func extractTracks(inputFile string, tracks []float64, mbr musicBrainzRelease, d
 	return nil
 }
 
-func tagFile(path string, artist, title, year, album string, trackNum, tracksTotal int, cdNum int64) error {
+func tagFile(path string, artists []string, title, year, album string, trackNum, tracksTotal int, cdNum int64) error {
 	tag, err := id3v2.Open(path, id3v2.Options{Parse: true})
 	if err != nil {
 		return errors.Wrap(err, "id3v2 open failed")
 	}
 	defer tag.Close()
 
-	tag.SetArtist(artist)
+	tag.SetArtist(strings.Join(artists, "/"))
 	tag.SetTitle(title)
 	tag.SetYear(year)
 	tag.SetAlbum(album)
