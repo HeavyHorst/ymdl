@@ -129,7 +129,7 @@ func getTrackInfo(client *gomusicbrainz.WS2Client, query string) (musicBrainzRec
 			}
 
 			fmt.Printf("\nRelease: %s (%s)\nCD: %d - %.2d/%.2d\nTrack: %s - %s\n",
-				recording.albumTitle, recording.year, recording.cdNum, recording.trackNum, recording.trackCount, strings.Join(artists, ","), recording.trackTitle)
+				recording.albumTitle, recording.year, recording.cdNum, recording.trackNum, recording.trackCount, artists, recording.trackTitle)
 
 			if askForConfirmation("Choose track?") {
 				proceed = false
