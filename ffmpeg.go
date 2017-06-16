@@ -10,6 +10,7 @@ import (
 	"github.com/bogem/id3v2"
 	"github.com/cheggaaa/pb"
 	"github.com/pkg/errors"
+	"github.com/subosito/norma"
 )
 
 var errInvalidInput = errors.New("invalid duration")
@@ -41,7 +42,7 @@ func convertTrack(inputFile string, mbr musicBrainzRecording, dlFolder string) e
 	}
 	artists := strings.Join(mbr.trackArtists, ",")
 	trackName := fmt.Sprintf("%.2d %s - %s", mbr.trackNum, artists, mbr.trackTitle)
-	trackFullPath := filepath.Join(dlFolder, trackName) + "." + "mp3"
+	trackFullPath := filepath.Join(dlFolder, norma.Sanitize(trackName)) + "." + "mp3"
 
 	if err := transcode(inputFile, trackFullPath, 0.0, float64(l)); err != nil {
 		return errors.Wrap(err, "transcode failed")
@@ -72,7 +73,7 @@ func extractTracks(inputFile string, tracks []float64, mbr musicBrainzRelease, d
 			title := mbr.tracks[i].Recording.Title
 
 			trackName := fmt.Sprintf("%.2d %s - %s", i+1, strings.Join(artist, ","), title)
-			trackFullPath := filepath.Join(dlFolder, trackName) + "." + "mp3"
+			trackFullPath := filepath.Join(dlFolder, norma.Sanitize(trackName)) + "." + "mp3"
 			start := tracks[i]
 			end := tracks[i+1]
 			length := end - start
