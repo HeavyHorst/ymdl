@@ -111,31 +111,34 @@ func getTrackInfo(client *gomusicbrainz.WS2Client, query string) (musicBrainzRec
 		})
 
 		trackTitle := value.Get("title").String()
-		value.Get("releases").ForEach(func(key, value gjson.Result) bool {
+		value.Get("releases").ForEach(func(key, release gjson.Result) bool {
+			release.Get("media").ForEach(func(key, media gjson.Result) bool {
 
-			recording = musicBrainzRecording{
-				albumArtist:  artist,
-				trackArtists: artists,
-				cdNum:        value.Get("media.0.position").Int(),
-				trackCount:   value.Get("media.0.track-count").Int(),
-				trackNum:     value.Get("media.0.track-offset").Int() + 1,
-				albumTitle:   value.Get("title").String(),
-				year:         value.Get("date").String(),
-				trackTitle:   trackTitle,
-			}
+				recording = musicBrainzRecording{
+					albumArtist:  artist,
+					trackArtists: artists,
+					cdNum:        media.Get("position").Int(),
+					trackCount:   media.Get("track-count").Int(),
+					trackNum:     media.Get("track-offset").Int() + 1,
+					albumTitle:   release.Get("title").String(),
+					year:         release.Get("date").String(),
+					trackTitle:   trackTitle,
+				}
 
-			if len(recording.year) >= 4 {
-				recording.year = recording.year[0:4]
-			}
+				if len(recording.year) >= 4 {
+					recording.year = recording.year[0:4]
+				}
 
-			fmt.Printf("\nRelease: %s (%s)\nCD: %d - %.2d/%.2d\nTrack: %s - %s\n",
-				recording.albumTitle, recording.year, recording.cdNum, recording.trackNum, recording.trackCount, artists, recording.trackTitle)
+				fmt.Printf("Release: %s (%s)\nFormat: %s\nTrack: %.2d/%.2d %s - %s\n",
+					recording.albumTitle, recording.year, media.Get("format").String(), recording.trackNum, recording.trackCount, artists, recording.trackTitle)
 
-			if askForConfirmation("Choose track?") {
-				proceed = false
-			}
+				if askForConfirmation("Choose track?") {
+					proceed = false
+				}
 
-			fmt.Println()
+				fmt.Println()
+				return proceed
+			})
 			return proceed
 		})
 		return proceed
