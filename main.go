@@ -14,6 +14,10 @@ import (
 	"github.com/subosito/norma"
 )
 
+const appName = "ymdl"
+const version = "0.0.1-beta"
+const contactURL = "github.com/HeavyHorst/ymdl"
+
 func handleError(err error) {
 	var e error
 	if err != nil {
@@ -61,10 +65,6 @@ func dlRecord(library string, client *gomusicbrainz.WS2Client, vid *ytdl.VideoIn
 
 	return convertTrack(dlFile, mbr, dlFolder)
 }
-
-const appName = "ymdl"
-const version = "0.0.1-beta"
-const contactURL = "github.com/HeavyHorst/ymdl"
 
 func main() {
 	var defaultLibraryPath string
