@@ -1,0 +1,16 @@
+language: go
+go:
+  - 1.5.4
+  - 1.6.4
+  - 1.7.5
+  - 1.8.1
+
+os:
+  - osx
+  - linux
+
+script:
+  - go build && go test -v ./...
+
+notifications:
+  email: false
